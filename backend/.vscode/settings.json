@@ -1,0 +1,5 @@
+{
+  "appService.preDeployTask": "publish-release",
+  "appService.deploySubpath": "bin/Release/net8.0/publish",
+  "appService.defaultWebAppToDeploy": "undefined/subscriptions/6e99d64e-d4c7-4d75-b6fe-28b51657177d/resourceGroups/MyResourceGroup/providers/Microsoft.Web/sites/DisertatieAPI"
+}

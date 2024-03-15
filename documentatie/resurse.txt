@@ -1,0 +1,3 @@
+https://markjames.dev/blog/jwt-authorization-asp-net-core
+
+https://www.youtube.com/watch?v=I_fTQTsz2nQ
