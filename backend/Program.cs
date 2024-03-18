@@ -23,7 +23,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApiDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Local"));
+    // options.UseNpgsql(builder.Configuration.GetConnectionString("Local"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Remote"));
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -161,12 +162,13 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
-}
+// if (app.Environment.IsDevelopment())
+// {
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
+
+// }
 
 app.UseHttpsRedirection();
 
@@ -180,7 +182,9 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    HubEndpointConventionBuilder hubEndpointConventionBuilder = endpoints.MapHub<GpsHub>("/ws/gps-hub");
+    HubEndpointConventionBuilder hubEndpointConventionBuilder = endpoints.MapHub<GpsHub>(
+        "/ws/gps-hub"
+    );
 });
 
 app.MapControllers();
