@@ -13,14 +13,14 @@ namespace backend.Controllers
     [ApiController]
     [Route("/api/products")]
     public class ProductController(
-            ILogger<ProductController> logger,
-            ApiDbContext context,
-            UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            IEmailService emailService,
-            IUser userAccount,
-            IConfiguration config
-                ) : ControllerBase
+        ILogger<ProductController> logger,
+        ApiDbContext context,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IEmailService emailService,
+        IUser userAccount,
+        IConfiguration config
+    ) : ControllerBase
     {
         private readonly ILogger<ProductController> _logger = logger;
         private readonly ApiDbContext _context = context;
@@ -45,10 +45,21 @@ namespace backend.Controllers
                 return Unauthorized();
             }
 
-            var wearer = await _context.Wearers.FirstOrDefaultAsync(w => w.Id == model.WearerID && w.User == user);
+            var wearer = await _context.Wearers.FirstOrDefaultAsync(w =>
+                w.Id == model.WearerID && w.User == user
+            );
+
             if (wearer is null)
             {
                 return NotFound();
+            }
+
+            if (
+                await _context.Products.FirstOrDefaultAsync(p => p.DeviceID == model.DeviceGUID)
+                is not null
+            )
+            {
+                return BadRequest();
             }
 
             var product = new Product
@@ -77,8 +88,7 @@ namespace backend.Controllers
                 return Unauthorized();
             }
 
-            var products = _context.Products.Where(p => p.User == user)
-                                            .Include(p => p.Wearer);
+            var products = _context.Products.Where(p => p.User == user).Include(p => p.Wearer);
             if (products is null)
             {
                 return NotFound();
@@ -99,6 +109,49 @@ namespace backend.Controllers
             return Ok(new { products = productsData });
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetProduct(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+            {
+                return Unauthorized();
+            }
+
+            var product = await _context
+                .Products.Include(p => p.Locations)
+                .FirstOrDefaultAsync(p => p.User == user && p.Id == id);
+
+            if (product is null)
+            {
+                return NotFound();
+            }
+
+            List<Location> locationsData = [];
+            foreach (var location in product.Locations)
+            {
+                var newLocation = new Location
+                {
+                    Latitude = location.Latitude,
+                    Longitude = location.Longitude,
+                    Date = location.Date,
+                    Time = location.Time
+                };
+                locationsData.Add(newLocation);
+            }
+
+            var productData = new
+            {
+                Id = product.Id,
+                SerialNumber = product.SerialNumber,
+                DeviceID = product.DeviceID,
+                WearerID = product.WearerID,
+            };
+
+            return Ok(new { Product = productData, Locations = locationsData });
+        }
+
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteProduct(int id)
@@ -109,7 +162,9 @@ namespace backend.Controllers
                 return Unauthorized();
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.User == user && p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p =>
+                p.User == user && p.Id == id
+            );
             if (product is null)
             {
                 return NotFound();
