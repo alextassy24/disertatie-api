@@ -31,6 +31,13 @@ namespace backend.Controllers
         private readonly IUser _userAccount = userAccount;
         private readonly IConfiguration _config = config;
 
+        [HttpGet]
+        [Route("/check-connection")]
+        public async Task<IActionResult> CheckConnection()
+        {
+            return Ok();
+        }
+
         [HttpPost]
         public async Task<IActionResult> RegisterLocation(
             [FromQuery] RegisterLocationViewModel model
