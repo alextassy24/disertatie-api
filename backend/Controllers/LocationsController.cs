@@ -35,7 +35,7 @@ namespace backend.Controllers
         [Route("/check-connection")]
         public async Task<IActionResult> CheckConnection()
         {
-            return Ok();
+            return Ok("Connection to the API successful!");
         }
 
         [HttpPost]
