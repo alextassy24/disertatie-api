@@ -32,7 +32,7 @@ namespace backend.Controllers
         private readonly IConfiguration _config = config;
 
         [HttpGet]
-        [Route("/check-connection")]
+        [Route("/t")]
         public async Task<IActionResult> CheckConnection()
         {
             return Ok("Connection to the API successful!");
