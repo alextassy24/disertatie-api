@@ -133,10 +133,10 @@ namespace backend.Controllers
             {
                 var newLocation = new Location
                 {
-                    Latitude = location.Latitude,
-                    Longitude = location.Longitude,
                     Date = location.Date,
-                    Time = location.Time
+                    Time = location.Time,
+                    Latitude = location.Latitude,
+                    Longitude = location.Longitude
                 };
                 locationsData.Add(newLocation);
             }

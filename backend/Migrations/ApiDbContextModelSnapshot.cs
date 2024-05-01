@@ -181,7 +181,7 @@ namespace backend.Migrations
 
                     b.HasIndex("ProductID");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Product", b =>
@@ -212,7 +212,7 @@ namespace backend.Migrations
 
                     b.HasIndex("WearerID");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Token", b =>
@@ -245,7 +245,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Tokens");
+                    b.ToTable("Tokens", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -346,7 +346,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Wearers");
+                    b.ToTable("Wearers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

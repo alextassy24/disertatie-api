@@ -67,7 +67,7 @@ namespace backend.Controllers
         0 - wearer not found;
         1 - wearer has no product/(s)
         */
-        public async Task<IActionResult> GetWearer()
+        public async Task<IActionResult> GetWearer(int id)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user is null)
@@ -75,7 +75,9 @@ namespace backend.Controllers
                 return Unauthorized();
             }
 
-            var wearer = await _context.Wearers.FirstOrDefaultAsync(w => w.User == user);
+            var wearer = await _context.Wearers.FirstOrDefaultAsync(w =>
+                w.User == user && w.Id == id
+            );
             if (wearer is null)
             {
                 return NotFound(new { Message = 0 });
@@ -102,6 +104,7 @@ namespace backend.Controllers
                 Age = wearer.Age,
                 Name = wearer.Name,
             };
+            Console.WriteLine(wearerData.Name);
 
             var responseData = new { Wearer = wearerData, Products = products };
 

@@ -60,7 +60,9 @@ namespace backend.Controllers
             {
                 ProductID = product.Id,
                 Latitude = model.Latitude,
-                Longitude = model.Longitude
+                Longitude = model.Longitude,
+                Time = TimeOnly.FromDateTime(DateTime.Now).ToString("HH:mm:ss"),
+                Date = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"),
             };
 
             _context.Locations.Add(location);
@@ -100,10 +102,10 @@ namespace backend.Controllers
             {
                 var newLocation = new Location
                 {
-                    Latitude = location.Latitude,
-                    Longitude = location.Longitude,
                     Date = location.Date,
-                    Time = location.Time
+                    Time = location.Time,
+                    Latitude = location.Latitude,
+                    Longitude = location.Longitude
                 };
                 locationsData.Add(newLocation);
             }
