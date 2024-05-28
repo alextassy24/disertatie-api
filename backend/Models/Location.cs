@@ -13,6 +13,6 @@ namespace backend.Models
         public string Date { get; set; }
         public string Time { get; set; }
         public Product Product { get; set; }
-        public int ProductID { get; set; }
+        public Guid ProductID { get; set; }
     }
 }

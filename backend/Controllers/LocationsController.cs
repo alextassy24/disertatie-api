@@ -51,6 +51,7 @@ namespace backend.Controllers
             var product = await _context.Products.FirstOrDefaultAsync(p =>
                 p.DeviceID == model.DeviceGUID
             );
+
             if (product is null)
             {
                 return NotFound();
@@ -58,7 +59,7 @@ namespace backend.Controllers
 
             var location = new Location
             {
-                ProductID = product.Id,
+                ProductID = product.DeviceID,
                 Latitude = model.Latitude,
                 Longitude = model.Longitude,
                 Time = TimeOnly.FromDateTime(DateTime.Now).ToString("HH:mm:ss"),

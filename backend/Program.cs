@@ -98,6 +98,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<MqttConfiguration>(builder.Configuration.GetSection("Mqtt"));
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 
@@ -139,6 +140,8 @@ builder.Services.AddCors(options =>
                 .AllowCredentials()
     );
 });
+
+builder.Services.AddHostedService<MqttService>();
 
 builder.Services.AddSignalR();
 
