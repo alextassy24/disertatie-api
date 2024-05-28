@@ -134,8 +134,10 @@ builder.Services.AddCors(options =>
         "AllowOrigin",
         builder =>
             builder
-                .WithOrigins("http://localhost:5173")
-                .WithOrigins("https://yellow-forest-0c439cc03.4.azurestaticapps.net/")
+                .WithOrigins(
+                    "http://localhost:5173",
+                    "https://yellow-forest-0c439cc03.4.azurestaticapps.net"
+                )
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
