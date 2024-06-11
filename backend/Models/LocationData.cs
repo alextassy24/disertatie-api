@@ -11,6 +11,9 @@ namespace backend.Models
         [JsonPropertyName("lon")]
         public double Lon { get; set; }
 
+        [JsonPropertyName("sattelites")]
+        public int Sattelites { get; set; }
+
         [JsonPropertyName("guid")]
         public string Guid { get; set; }
     }

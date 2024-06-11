@@ -51,62 +51,85 @@ public class MqttService : IHostedService
             await _client.SubscribeAsync(
                 new MqttClientSubscribeOptionsBuilder()
                     .WithTopicFilter("alextassy24/feeds/gps")
+                    .WithTopicFilter("alextassy24/feeds/status")
                     .Build()
             );
         };
 
         _client.ApplicationMessageReceivedAsync += async e =>
         {
+            var topic = e.ApplicationMessage.Topic;
             var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-            // Console.WriteLine("Received MQTT message: " + message); // Log raw message
 
-            try
+            if (topic == "alextassy24/feeds/gps")
             {
-                var data = JsonSerializer.Deserialize<LocationData>(message);
-                // Console.WriteLine("Deserialized Data: " + JsonSerializer.Serialize(data)); // Log deserialized data
-
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-
-                    var product = context.Products.FirstOrDefault(p =>
-                        p.DeviceID == new Guid(data.Guid)
-                    );
-
-                    var location = new Location
-                    {
-                        Latitude = data.Lat.ToString(),
-                        Longitude = data.Lon.ToString(),
-                        Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
-                        Time = DateTime.UtcNow.ToString("HH:mm:ss"),
-                        ProductID = new Guid(data.Guid),
-                        Product = product,
-                        // Ensure this is correctly set
-                    };
-
-                    context.Locations.Add(location);
-                    await context.SaveChangesAsync();
-
-                    // Send data to SignalR clients
-                    // Console.WriteLine("Sending data to SignalR clients.");
-                    var locationData = new
-                    {
-                        Latitude = data.Lat.ToString(),
-                        Longitude = data.Lon.ToString(),
-                        Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
-                        Time = DateTime.UtcNow.ToString("HH:mm:ss"),
-                        ProductID = new Guid(data.Guid),
-                    };
-                    await _hubContext.Clients.All.SendAsync("ReceiveLocationUpdate", locationData);
-                }
+                await HandleGpsMessage(message);
             }
-            catch (Exception ex)
+            else if (topic == "alextassy24/feeds/status")
             {
-                Console.WriteLine("Error deserializing message: " + ex.Message);
+                await HandleStatusMessage(message);
             }
         };
 
         await _client.ConnectAsync(options, cancellationToken);
+    }
+
+    private async Task HandleGpsMessage(string message)
+    {
+        try
+        {
+            var data = JsonSerializer.Deserialize<LocationData>(message);
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+                var product = context.Products.FirstOrDefault(p =>
+                    p.DeviceID == new Guid(data.Guid)
+                );
+
+                var location = new Location
+                {
+                    Latitude = data.Lat.ToString(),
+                    Longitude = data.Lon.ToString(),
+                    Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+                    Time = DateTime.UtcNow.ToString("HH:mm:ss"),
+                    ProductID = new Guid(data.Guid),
+                    Product = product,
+                };
+
+                context.Locations.Add(location);
+                await context.SaveChangesAsync();
+
+                var locationData = new
+                {
+                    Latitude = data.Lat.ToString(),
+                    Longitude = data.Lon.ToString(),
+                    Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+                    Time = DateTime.UtcNow.ToString("HH:mm:ss"),
+                    Sattelites = data.Sattelites.ToString(),
+                    ProductID = new Guid(data.Guid),
+                };
+                await _hubContext.Clients.All.SendAsync("ReceiveLocationUpdate", locationData);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error deserializing GPS message: " + ex.Message);
+        }
+    }
+
+    private async Task HandleStatusMessage(string message)
+    {
+        try
+        {
+            Console.WriteLine("Received status message: " + message);
+            await _hubContext.Clients.All.SendAsync("ReceiveStatusUpdate", message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error handling status message: " + ex.Message);
+        }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
