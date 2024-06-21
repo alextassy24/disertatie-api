@@ -52,6 +52,7 @@ public class MqttService : IHostedService
                 new MqttClientSubscribeOptionsBuilder()
                     .WithTopicFilter("alextassy24/feeds/gps")
                     .WithTopicFilter("alextassy24/feeds/status")
+                    .WithTopicFilter("alextassy24/feeds/battery")
                     .Build()
             );
         };
@@ -68,6 +69,10 @@ public class MqttService : IHostedService
             else if (topic == "alextassy24/feeds/status")
             {
                 await HandleStatusMessage(message);
+            }
+            else if (topic == "alextassy24/feeds/battery")
+            {
+                await HandleBatteryMessage(message);
             }
         };
 
@@ -123,8 +128,21 @@ public class MqttService : IHostedService
     {
         try
         {
-            Console.WriteLine("Received status message: " + message);
+            // Console.WriteLine("Received status message: " + message);
             await _hubContext.Clients.All.SendAsync("ReceiveStatusUpdate", message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error handling status message: " + ex.Message);
+        }
+    }
+
+    private async Task HandleBatteryMessage(string message)
+    {
+        try
+        {
+            // Console.WriteLine("Received status message: " + message);
+            await _hubContext.Clients.All.SendAsync("ReceiveBatteryUpdate", message);
         }
         catch (Exception ex)
         {
