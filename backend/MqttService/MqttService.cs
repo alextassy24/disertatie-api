@@ -90,16 +90,16 @@ public class MqttService : IHostedService
                 var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
 
                 var product = context.Products.FirstOrDefault(p =>
-                    p.DeviceID == new Guid(data.Guid)
+                    p.DeviceID == new Guid(data.guid)
                 );
 
                 var location = new Location
                 {
-                    Latitude = data.Lat.ToString(),
-                    Longitude = data.Lon.ToString(),
+                    Latitude = data.lat.ToString(),
+                    Longitude = data.lon.ToString(),
                     Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                     Time = DateTime.UtcNow.ToString("HH:mm:ss"),
-                    ProductID = new Guid(data.Guid),
+                    ProductID = new Guid(data.guid),
                     Product = product,
                 };
 
@@ -108,12 +108,11 @@ public class MqttService : IHostedService
 
                 var locationData = new
                 {
-                    Latitude = data.Lat.ToString(),
-                    Longitude = data.Lon.ToString(),
+                    Latitude = data.lat.ToString(),
+                    Longitude = data.lon.ToString(),
                     Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                     Time = DateTime.UtcNow.ToString("HH:mm:ss"),
-                    Sattelites = data.Sattelites.ToString(),
-                    ProductID = new Guid(data.Guid),
+                    ProductID = new Guid(data.guid),
                 };
                 await _hubContext.Clients.All.SendAsync("ReceiveLocationUpdate", locationData);
             }
@@ -129,7 +128,15 @@ public class MqttService : IHostedService
         try
         {
             // Console.WriteLine("Received status message: " + message);
-            await _hubContext.Clients.All.SendAsync("ReceiveStatusUpdate", message);
+            var data = JsonSerializer.Deserialize<StatusMessage>(message);
+
+            var statusMessage = new
+            {
+                guid = new Guid(data.guid),
+                status_message = data.status_message
+            };
+            // Console.WriteLine(statusMessage);
+            await _hubContext.Clients.All.SendAsync("ReceiveStatusUpdate", statusMessage);
         }
         catch (Exception ex)
         {
@@ -141,12 +148,20 @@ public class MqttService : IHostedService
     {
         try
         {
-            // Console.WriteLine("Received status message: " + message);
-            await _hubContext.Clients.All.SendAsync("ReceiveBatteryUpdate", message);
+            var data = JsonSerializer.Deserialize<BatteryStatus>(message);
+
+            var statusMessage = new
+            {
+                guid = new Guid(data.guid),
+                battery_percentage = data.battery_percentage
+            };
+            // Console.WriteLine(statusMessage);
+            await _hubContext.Clients.All.SendAsync("ReceiveBatteryUpdate", statusMessage);
+            // Console.WriteLine("Battery status is sent");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error handling status message: " + ex.Message);
+            Console.WriteLine("Error handling battery message: " + ex.Message);
         }
     }
 

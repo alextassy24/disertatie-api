@@ -6,15 +6,12 @@ namespace backend.Models
     public class LocationData
     {
         [JsonPropertyName("lat")]
-        public double Lat { get; set; }
+        public double lat { get; set; }
 
         [JsonPropertyName("lon")]
-        public double Lon { get; set; }
-
-        [JsonPropertyName("sattelites")]
-        public int Sattelites { get; set; }
+        public double lon { get; set; }
 
         [JsonPropertyName("guid")]
-        public string Guid { get; set; }
+        public string guid { get; set; }
     }
 }
