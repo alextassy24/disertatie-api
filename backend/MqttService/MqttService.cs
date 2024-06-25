@@ -81,10 +81,14 @@ public class MqttService : IHostedService
 
     private async Task HandleGpsMessage(string message)
     {
+        // Console.WriteLine("GPS Message = ");
+        // Console.WriteLine(message);
         try
         {
             var data = JsonSerializer.Deserialize<LocationData>(message);
 
+            // Console.WriteLine("GPS Data = ");
+            // Console.WriteLine(data);
             using (var scope = _scopeFactory.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
@@ -125,6 +129,8 @@ public class MqttService : IHostedService
 
     private async Task HandleStatusMessage(string message)
     {
+        // Console.WriteLine("Status Message = ");
+        // Console.WriteLine(message);
         try
         {
             // Console.WriteLine("Received status message: " + message);
@@ -146,6 +152,8 @@ public class MqttService : IHostedService
 
     private async Task HandleBatteryMessage(string message)
     {
+        // Console.WriteLine("Battery Message = ");
+        // Console.WriteLine(message);
         try
         {
             var data = JsonSerializer.Deserialize<BatteryStatus>(message);
